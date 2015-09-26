@@ -88,6 +88,12 @@ wss.on('connection', ws => {
           //    [ { type: P12, pos: [2, 3] }, { type: P13, pos: null }... ]
           // ]
 
+          // actions = [
+          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 1], shoot: "west" }, ... ],
+          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 2], dead: true }, ... ],
+          //    [ { type: P12, pos: [2, 3] }, { type: P13, shoot: "north" }... ]
+          // ]
+
           // Add null (shoot) to the end of the array
           Object.values(game.moves).forEach(move => Object.values(move).forEach(i => i.push(null)));
 
