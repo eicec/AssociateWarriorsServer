@@ -1,13 +1,13 @@
-const P11 = 11;
-const P12 = 12;
-const P13 = 13;
+const MONEY = 3;
 
-const P21 = 21;
-const P22 = 22;
-const P23 = 23;
+const WALL_SW = 13;
+const WALL_W = 14;
+const WALL_S = 15;
 
-const MONEY = 99;
+const P11 = 5;
+const P12 = 6;
+const P13 = 7;
 
-const WALL_S = 1;
-const WALL_W = 2;
-const WALL_SW = 3;
+const P21 = 9;
+const P22 = 10;
+const P23 = 11;

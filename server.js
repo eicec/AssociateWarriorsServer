@@ -67,8 +67,8 @@ wss.on('connection', ws => {
       case 'MOVE':
         game.moves[player.id] = message.move;
 
-        var players = Object.keys(game.moves);
-        if (players.length == NUM_PLAYERS) {
+        var playerIds = Object.keys(game.moves);
+        if (playerIds.length == NUM_PLAYERS) {
           let actions = [];
 
           // game.moves = {
@@ -85,15 +85,15 @@ wss.on('connection', ws => {
           // }
 
           // moves = [
-          //    [ { idx: P11, pos: [0, 0] }, ... ],
-          //    [ { idx: P11, pos: [0, 0] }, ... ],
-          //    [ { idx: P12, pos: [2, 3] }, {idx: P13, pos: null }... ]
+          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 1] }, ... ],
+          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 2] }, ... ],
+          //    [ { type: P12, pos: [2, 3] }, { type: P13, pos: null }... ]
           // ]
 
           // Add null (shoot) to the end of the array
-          Object.values(game.moves).forEach(move => move.push(null));
+          Object.values(game.moves).forEach(move => Object.values(move).forEach(i => i.push(null)));
 
-          let moves = players.map((playerId) => game.moves[playerId].map(move => ({ playerId, move })));
+          //let moves = playerIds.map((playerId) => game.moves[playerId].map(move => ({ playerId, move })));
           // TODO
 
           game.players.forEach(otherPlayer => {
