@@ -3,8 +3,6 @@ import UUID from 'uuid-js';
 import c from './constants.js';
 
 const NUM_PLAYERS = 2;
-
-let wss = new WebSocketServer({ port: 8080 });
 let currentGame;
 
 function sendMessage(player, message) {
@@ -20,7 +18,13 @@ function setupPlayer(ws) {
   if (!game) {
     console.log('starting new game');
 
-    game = currentGame = { id: UUID.create().toString(), players: [] };
+    game = currentGame = {
+      id: UUID.create().toString(),
+      players: [],
+      state: [],
+      walls: [],
+      moves: {}
+    };
   } else {
     console.log('joining existing game: %s', game.id);
   }
@@ -37,6 +41,8 @@ function setupPlayer(ws) {
 
   return [player, game];
 }
+
+let wss = new WebSocketServer({ port: 8080 });
 
 wss.on('connection', ws => {
   let [player, game] = setupPlayer(ws);
@@ -56,6 +62,18 @@ wss.on('connection', ws => {
             sendMessage(otherPlayer, { type: "STATE", state: game.state, walls: game.walls });
           }
         });
+        break;
+
+      case 'MOVE':
+        game.moves[player.id] = message.move;
+
+        if (Object.keys(game.moves).length == NUM_PLAYERS) {
+          game.players.forEach(otherPlayer => {
+            // TODO play game
+            sendMessage(otherPlayer, { type: "ACTIONS", actions: [] });
+          });
+        }
+
         break;
     }
   });

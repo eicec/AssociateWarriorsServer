@@ -24,7 +24,7 @@ ws.on('message', function(message) {
       if (message.firstPlayer) {
 
         ws.send(JSON.stringify({ type: "STATE", state: state, walls: walls }));
-        ws.send(JSON.stringify({ type: "MOVE" }));
+        ws.send(JSON.stringify({ type: "MOVE", move: [] }));
       }
       break;
 
@@ -32,7 +32,7 @@ ws.on('message', function(message) {
       state = message.state;
       walls = message.walls;
 
-      ws.send(JSON.stringify({ type: "MOVE" }));
+      ws.send(JSON.stringify({ type: "MOVE", move: [] }));
       break;
   }
 });
