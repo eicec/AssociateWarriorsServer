@@ -69,8 +69,6 @@ wss.on('connection', ws => {
 
         var playerIds = Object.keys(game.moves);
         if (playerIds.length == NUM_PLAYERS) {
-          let actions = [];
-
           // game.moves = {
           //   p1: {
           //     P11: [ [0, 0], [0, 1] ],
@@ -93,7 +91,22 @@ wss.on('connection', ws => {
           // Add null (shoot) to the end of the array
           Object.values(game.moves).forEach(move => Object.values(move).forEach(i => i.push(null)));
 
-          //let moves = playerIds.map((playerId) => game.moves[playerId].map(move => ({ playerId, move })));
+          let moves = []; //playerIds.map(playerId => game.moves[playerId].map(move => ({ playerId, move })));
+          let actions = [];
+          moves.forEach(move => {
+            move.forEach(i => {
+              if (i.pos == null) {
+                // TODO Shoot
+              } else {
+                move.forEach(j => {
+                  if (j != i && j.pos == i.pos) {
+                    // "Pedra, papel, tesoura" tartaruga ganha a gato, gato ganha a jabali, jabali ganha a tartaruga
+                  }
+                });
+              }
+            });
+            actions.add(move);
+          });
           // TODO
 
           game.players.forEach(otherPlayer => {
