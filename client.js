@@ -10,6 +10,10 @@ let walls = a(9).map(() => a(16).map(() => 0));
 
 let ws = new WebSocket('ws://localhost:8080/');
 
+function send(message) {
+  ws.send(JSON.stringify(message));
+}
+
 ws.on('open', function() {
 });
 
@@ -18,13 +22,11 @@ ws.on('message', function(message) {
 
   message = JSON.parse(message);
 
-  console.log('received: %s', message.type);
   switch (message.type) {
     case 'START':
       if (message.firstPlayer) {
-
-        ws.send(JSON.stringify({ type: "STATE", state: state, walls: walls }));
-        ws.send(JSON.stringify({ type: "MOVE", move: [] }));
+        send({ type: "STATE", state: state, walls: walls });
+        send({ type: "MOVE", move: [] });
       }
       break;
 
@@ -32,7 +34,7 @@ ws.on('message', function(message) {
       state = message.state;
       walls = message.walls;
 
-      ws.send(JSON.stringify({ type: "MOVE", move: [] }));
+      send({ type: "MOVE", move: [] });
       break;
   }
 });

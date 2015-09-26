@@ -5,7 +5,7 @@ import c from './constants.js';
 const NUM_PLAYERS = 2;
 let currentGame;
 
-function sendMessage(player, message) {
+function send(player, message) {
   player.ws.send(JSON.stringify(message));
 }
 
@@ -33,7 +33,7 @@ function setupPlayer(ws) {
 
   if (game.players.length >= NUM_PLAYERS) {
     game.players.forEach(otherPlayer => {
-      sendMessage(otherPlayer, { type: "START", firstPlayer: otherPlayer == player });
+      send(otherPlayer, { type: "START", firstPlayer: otherPlayer == player });
     });
 
     currentGame = null;
@@ -59,7 +59,7 @@ wss.on('connection', ws => {
 
         game.players.forEach(otherPlayer => {
           if (otherPlayer != player) {
-            sendMessage(otherPlayer, { type: "STATE", state: game.state, walls: game.walls });
+            send(otherPlayer, { type: "STATE", state: game.state, walls: game.walls });
           }
         });
         break;
@@ -67,10 +67,37 @@ wss.on('connection', ws => {
       case 'MOVE':
         game.moves[player.id] = message.move;
 
-        if (Object.keys(game.moves).length == NUM_PLAYERS) {
+        var players = Object.keys(game.moves);
+        if (players.length == NUM_PLAYERS) {
+          let actions = [];
+
+          // game.moves = {
+          //   p1: {
+          //     P11: [ [0, 0], [0, 1] ],
+          //     P12: [ [2, 1], [2, 2], [2, 3] ],
+          //     P13: [ [3, 0], [3, 1] ]
+          //   },
+          //   p2: [
+          //     P21: [ [0, 0], [0, 1] ],
+          //     P22: [ [2, 1] ],
+          //     P23: [ ]
+          //   ],
+          // }
+
+          // moves = [
+          //    [ { idx: P11, pos: [0, 0] }, ... ],
+          //    [ { idx: P11, pos: [0, 0] }, ... ],
+          //    [ { idx: P12, pos: [2, 3] }, {idx: P13, pos: null }... ]
+          // ]
+
+          // Add null (shoot) to the end of the array
+          Object.values(game.moves).forEach(move => move.push(null));
+
+          let moves = players.map((playerId) => game.moves[playerId].map(move => ({ playerId, move })));
+          // TODO
+
           game.players.forEach(otherPlayer => {
-            // TODO play game
-            sendMessage(otherPlayer, { type: "ACTIONS", actions: [] });
+            send(otherPlayer, { type: "ACTIONS", actions });
           });
         }
 
