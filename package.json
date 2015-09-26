@@ -1,0 +1,19 @@
+{
+  "name": "AssociateWarriorServer",
+  "version": "0.1.0",
+  "description": "AssociateWarriorServer",
+  "private": false,
+  "scripts": {
+    "start": "nodemon -x babel-node server.js",
+    "client": "babel-node client.js"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "author": "César Izurieta",
+  "devDependencies": {
+    "nodemon": "^1.7.1",
+    "uuid-js": "^0.7.5",
+    "ws": "^0.8.0"
+  }
+}
