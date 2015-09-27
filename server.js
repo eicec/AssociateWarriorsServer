@@ -222,7 +222,7 @@ function findTarget(game, pos, player) {
 
   // NORTH
   x = pos[0];
-  for (y = pos[1]; y > -1; y--) {
+  for (y = pos[1] - 1; y > -1; y--) {
     let wall = y + 1 < h && game.walls[y + 1][x];
     if (wall == c.WALL_S || wall == c.WALL_SW) {
       break;
@@ -235,7 +235,7 @@ function findTarget(game, pos, player) {
   }
   // EAST
   y = pos[1];
-  for (x = pos[0]; x < w; x++) {
+  for (x = pos[0] + 1; x < w; x++) {
     let wall = x + 1 < w && game.walls[y][x + 1];
     if (wall == c.WALL_W || wall == c.WALL_SW) {
       break;
@@ -248,7 +248,7 @@ function findTarget(game, pos, player) {
   }
   // SOUTH
   x = pos[0];
-  for (y = pos[1]; y < h; y++) {
+  for (y = pos[1] + 1; y < h; y++) {
     let wall = game.walls[y][x];
     if (wall == c.WALL_S || wall == c.WALL_SW) {
       break;
@@ -261,7 +261,7 @@ function findTarget(game, pos, player) {
   }
   // WEST
   y = pos[1];
-  for (x = pos[0]; x > -1; x--) {
+  for (x = pos[0] - 1; x > -1; x--) {
     let wall = game.walls[y][x];
     if (wall == c.WALL_W || wall == c.WALL_SW) {
       break;
