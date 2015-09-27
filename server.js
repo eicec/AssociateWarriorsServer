@@ -168,7 +168,10 @@ wss.on('connection', ws => {
 
           game.players.forEach(otherPlayer => {
             send(otherPlayer, { type: "ACTIONS", actions });
+            send(otherPlayer, { type: "STATE", state: game.state, walls: game.walls });
           });
+
+          game.moves = {}
         }
 
         break;
@@ -178,15 +181,11 @@ wss.on('connection', ws => {
 
 function updateState(game, move) {
   let chars = Object.keys(move);
-  let charsInt = chars.map(x => parseInt(x));
-
-  game.state = game.state.map(row => row.map(cell => {
-    return charsInt.indexOf(cell) != -1 ? 0 : cell
-  }));
 
   chars.forEach(char => {
     let pos = move[char].pos;
     if (pos) {
+      game.state = game.state.map(row => row.map(cell => cell == parseInt(char) ? 0 : cell ));
       game.state[pos[1]][pos[0]] = parseInt(char);
     }
   });
@@ -197,8 +196,7 @@ function findPos(game, type) {
   for (let row of game.state) {
     for (let cell of row) {
       if (cell == typeInt) {
-        return [row.indexOf(cell), game.state
-            .indexOf(row)];
+        return [row.indexOf(cell), game.state.indexOf(row)];
       }
     }
   }
