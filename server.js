@@ -84,6 +84,13 @@ wss.on('connection', ws => {
 
           let moves = [];
 
+          playerIds.forEach(playerId => {
+            var playerMoves = game.moves[playerId];
+            Object.keys(playerMoves).forEach(k => {
+              playerMoves[k].push(false);
+            });
+          });
+
           let n = 0;
           while (n < 99) {
             let move = {};
@@ -111,8 +118,31 @@ wss.on('connection', ws => {
           // ]
 
           let actions = [];
-          moves.forEach(move => {
-            // Primeiro mover os personagens
+          let dead = [];
+          for (let m = 0; m < moves.length; m++) {
+            let move = moves[m];
+            // Revisar se tem que atirar
+            Object.keys(move).forEach(k => {
+              let i = move[k];
+              if (i && !i.pos) {
+                delete i["pos"];
+                let pos = findPos(game, k);
+                let [shoot, die] = findTarget(game, pos, player);
+                i.shoot = shoot;
+                if (die) {
+                  if (!move[die]) {
+                    move[die] = {};
+                  }
+                  move[die]["die"] = true;
+                  dead.push(die);
+                  for (let n = m + 1; n < moves.length; n++) {
+                    delete moves[m][die];
+                  }
+                }
+              }
+            });
+
+            // Mover os personagens
             Object.keys(move).forEach(k => {
               let i = move[k];
               Object.keys(move).forEach(l => {
@@ -126,23 +156,8 @@ wss.on('connection', ws => {
             // Atualizar o estado do tabueiro
             updateState(game, move);
 
-            // Revisar se tem que atirar
-            Object.keys(move).forEach(k => {
-              let i = move[k];
-              if (i && i.shoot) {
-                let [shoot, dead] = findTarget(game, i.pos, player);
-                i.shoot = shoot;
-                if (dead) {
-                  if (!move[dead]) {
-                    move[dead] = {};
-                  }
-                  move[dead]["die"] = true;
-                }
-              }
-            });
-
             actions.push(move);
-          });
+          }
 
           // actions = [
           //    { P11: { pos: [0, 0] }, P12: { pos: [2, 1] }, P13: { pos: [3, 0] }, ... ],
@@ -171,14 +186,36 @@ function updateState(game, move) {
 
   chars.forEach(char => {
     let pos = move[char].pos;
-    game.state[pos[1]][pos[0]] = parseInt(char);
+    if (pos) {
+      game.state[pos[1]][pos[0]] = parseInt(char);
+    }
   });
 }
 
+function findPos(game, type) {
+  let typeInt = parseInt(type);
+  for (let row of game.state) {
+    for (let cell of row) {
+      if (cell == typeInt) {
+        return [game.state.indexOf(row), row.indexOf(cell)];
+      }
+    }
+  }
+}
+
 function findTarget(game, pos, player) {
+  if (!pos) {
+    return [false, false];
+  }
+
   let x, y;
   let type = game.state[pos[1]][pos[0]];
   let char = c.CHARACTERS[type];
+
+  if (type == 0) {
+    return [false, false];
+  }
+
   let h = game.state.length;
   let w = game.state[0].length;
 
