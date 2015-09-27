@@ -178,7 +178,7 @@ wss.on('connection', ws => {
 
 function updateState(game, move) {
   let chars = Object.keys(move);
-  let charsInt = Object.keys(move).map(x => parseInt(x));
+  let charsInt = chars.map(x => parseInt(x));
 
   game.state = game.state.map(row => row.map(cell => {
     return charsInt.indexOf(cell) != -1 ? 0 : cell
@@ -197,7 +197,8 @@ function findPos(game, type) {
   for (let row of game.state) {
     for (let cell of row) {
       if (cell == typeInt) {
-        return [game.state.indexOf(row), row.indexOf(cell)];
+        return [row.indexOf(cell), game.state
+            .indexOf(row)];
       }
     }
   }
@@ -209,10 +210,12 @@ function findTarget(game, pos, player) {
   }
 
   let x, y;
+  console.log("pos=", pos);
+  console.log("row=", game.state[pos[1]]);
   let type = game.state[pos[1]][pos[0]];
   let char = c.CHARACTERS[type];
 
-  if (type == 0) {
+  if (!type || type <= 0 || !char) {
     return [false, false];
   }
 
