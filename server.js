@@ -82,38 +82,59 @@ wss.on('connection', ws => {
           //   ],
           // }
 
+          let moves = [];
+
+          let n = 0;
+          while (n < 99) {
+            let move = {};
+            playerIds.forEach(playerId => {
+              var playerMoves = game.moves[playerId];
+              Object.keys(playerMoves).forEach(k => {
+                if (playerMoves[k].length > n) {
+                  move[k] = { pos: playerMoves[k][n] };
+                }
+              })
+            });
+            if (Object.keys(move).length == 0) {
+              break;
+            }
+            moves.push(move);
+            n++;
+          }
+
           // moves = [
-          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 1] }, ... ],
-          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 2] }, ... ],
-          //    [ { type: P12, pos: [2, 3] }, { type: P13, pos: null }... ]
+          //    { P11: { pos: [0, 0] }, P12: { pos: [2, 1] }, P13: { pos: [3, 0] }, ... },
+          //    { P11: { pos: [0, 0] }, P12: { pos: [2, 2] }, P13: { pos: [3, 1] } ... },
+          //    { P12: { pos: [2, 3] } ],
+          //    ...
           // ]
 
-          // actions = [
-          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 1], shoot: "west" }, ... ],
-          //    [ { type: P11, pos: [0, 0] }, { type: P12, pos: [2, 2], dead: true }, ... ],
-          //    [ { type: P12, pos: [2, 3] }, { type: P13, shoot: "north" }... ]
-          // ]
-
-          // Add null (shoot) to the end of the array
-          Object.values(game.moves).forEach(move => Object.values(move).forEach(i => i.push(null)));
-
-          let moves = []; //playerIds.map(playerId => game.moves[playerId].map(move => ({ playerId, move })));
           let actions = [];
           moves.forEach(move => {
-            move.forEach(i => {
+            console.log(1, move);
+            Object.keys(move).forEach(k => {
+              let i = move[k];
+              console.log(2, k, i);
               if (i.pos == null) {
                 // TODO Shoot
               } else {
-                move.forEach(j => {
+                Object.keys(move).forEach(l => {
+                  let j = move[l];
                   if (j != i && j.pos == i.pos) {
                     // "Pedra, papel, tesoura" tartaruga ganha a gato, gato ganha a jabali, jabali ganha a tartaruga
                   }
                 });
               }
             });
-            actions.add(move);
+            actions.push(move);
           });
-          // TODO
+
+          // actions = [
+          //    { P11: { pos: [0, 0] }, P12: { pos: [2, 1] }, P13: { pos: [3, 0] }, ... ],
+          //    { P11: { pos: [0, 0] }, P12: { pos: [2, 2], shoot: "west" }, P13: { pos: [3, 1], shoot: "west" } ... ],
+          //    { P12: { pos: [2, 3], shoot: "north" } ],
+          //    ...
+          // ]
 
           game.players.forEach(otherPlayer => {
             send(otherPlayer, { type: "ACTIONS", actions });
