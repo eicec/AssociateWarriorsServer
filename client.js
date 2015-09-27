@@ -26,7 +26,7 @@ ws.on('message', function(message) {
     case 'START':
       if (message.firstPlayer) {
         send({ type: "STATE", state: state, walls: walls });
-        send({ type: "MOVE", move: { 4: [[1, 1], [2, 2]] } });
+        send({ type: "MOVE", move: { 5: [[1, 1], [1, 2]] } });
       }
       break;
 
@@ -34,7 +34,7 @@ ws.on('message', function(message) {
       state = message.state;
       walls = message.walls;
 
-      send({ type: "MOVE", move: { 8: [[3, 3], [4, 4]], 9: [[5, 5]] } });
+      send({ type: "MOVE", move: { 9: [[1, 3], [1, 4]], 10: [[1, 5]] } });
       break;
   }
 });

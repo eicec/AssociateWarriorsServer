@@ -1,6 +1,6 @@
 import {Server as WebSocketServer} from 'ws';
 import UUID from 'uuid-js';
-import c from './constants.js';
+import * as c from './constants.js';
 
 const NUM_PLAYERS = 2;
 let currentGame;
@@ -130,7 +130,14 @@ wss.on('connection', ws => {
             Object.keys(move).forEach(k => {
               let i = move[k];
               if (i && i.shoot) {
-                i.shoot = findTarget(game, i);
+                let [shoot, dead] = findTarget(game, i.pos, player);
+                i.shoot = shoot;
+                if (dead) {
+                  if (!move[dead]) {
+                    move[dead] = {};
+                  }
+                  move[dead]["die"] = true;
+                }
               }
             });
 
@@ -158,7 +165,9 @@ function updateState(game, move) {
   let chars = Object.keys(move);
   let charsInt = Object.keys(move).map(x => parseInt(x));
 
-  game.state = game.state.map(row => row.map(cell => { return charsInt.indexOf(cell) != -1 ? 0 : cell }));
+  game.state = game.state.map(row => row.map(cell => {
+    return charsInt.indexOf(cell) != -1 ? 0 : cell
+  }));
 
   chars.forEach(char => {
     let pos = move[char].pos;
@@ -166,6 +175,71 @@ function updateState(game, move) {
   });
 }
 
-function findTarget(game, player) {
+function findTarget(game, pos, player) {
+  let x, y;
+  let type = game.state[pos[1]][pos[0]];
+  let char = c.CHARACTERS[type];
+  let h = game.state.length;
+  let w = game.state[0].length;
 
+  // NORTH
+  x = pos[0];
+  for (y = pos[1]; y > -1; y--) {
+    let wall = y + 1 < h && game.walls[y + 1][x];
+    if (wall == c.WALL_S || wall == c.WALL_SW) {
+      break;
+    }
+    let otherType = game.state[y][x];
+    let otherChar = c.CHARACTERS[otherType];
+    if (otherChar && otherChar.player != player) {
+      return tryShoot(char, x, y, otherChar, otherType);
+    }
+  }
+  // EAST
+  y = pos[1];
+  for (x = pos[0]; x < w; x++) {
+    let wall = x + 1 < w && game.walls[y][x + 1];
+    if (wall == c.WALL_W || wall == c.WALL_SW) {
+      break;
+    }
+    let otherType = game.state[y][x];
+    let otherChar = c.CHARACTERS[otherType];
+    if (otherChar && otherChar.player != player) {
+      return tryShoot(char, x, y, otherChar, otherType);
+    }
+  }
+  // SOUTH
+  x = pos[0];
+  for (y = pos[1]; y < h; y++) {
+    let wall = game.walls[y][x];
+    if (wall == c.WALL_S || wall == c.WALL_SW) {
+      break;
+    }
+    let otherType = game.state[y][x];
+    let otherChar = c.CHARACTERS[otherType];
+    if (otherChar && otherChar.player != player) {
+      return tryShoot(char, x, y, otherChar, otherType);
+    }
+  }
+  // WEST
+  y = pos[1];
+  for (x = pos[0]; x > -1; x--) {
+    let wall = game.walls[y][x];
+    if (wall == c.WALL_W || wall == c.WALL_SW) {
+      break;
+    }
+    let otherType = game.state[y][x];
+    let otherChar = c.CHARACTERS[otherType];
+    if (otherChar && otherChar.player != player) {
+      return tryShoot(char, x, y, otherChar, otherType);
+    }
+  }
+
+  return [false, false];
+}
+
+function tryShoot(char, x, y, otherChar, otherType) {
+  let d = otherChar.defense;
+  let p = char.power;
+  return [[x, y], Math.random() > (d == p ? 0.6 : d > p ? 0.4 : 0.8) ? otherType : null];
 }
