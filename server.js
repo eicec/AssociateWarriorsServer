@@ -90,8 +90,9 @@ wss.on('connection', ws => {
             playerIds.forEach(playerId => {
               var playerMoves = game.moves[playerId];
               Object.keys(playerMoves).forEach(k => {
-                if (playerMoves[k].length > n) {
-                  move[k] = { pos: playerMoves[k][n] };
+                let length = playerMoves[k].length;
+                if (length > n) {
+                  move[k] = { pos: playerMoves[k][n], shoot: length == n + 1 };
                 }
               })
             });
@@ -111,28 +112,35 @@ wss.on('connection', ws => {
 
           let actions = [];
           moves.forEach(move => {
-            console.log(1, move);
+            // Primeiro mover os personagens
             Object.keys(move).forEach(k => {
               let i = move[k];
-              console.log(2, k, i);
-              if (i.pos == null) {
-                // TODO Shoot
-              } else {
-                Object.keys(move).forEach(l => {
-                  let j = move[l];
-                  if (j != i && j.pos == i.pos) {
-                    // "Pedra, papel, tesoura" tartaruga ganha a gato, gato ganha a jabali, jabali ganha a tartaruga
-                  }
-                });
+              Object.keys(move).forEach(l => {
+                let j = move[l];
+                if (i && j && i != j && i.pos == j.pos) {
+                  // "Pedra, papel, tesoura" tartaruga ganha a gato, gato ganha a jabali, jabali ganha a tartaruga
+                }
+              });
+            });
+
+            // Atualizar o estado do tabueiro
+            updateState(game, move);
+
+            // Revisar se tem que atirar
+            Object.keys(move).forEach(k => {
+              let i = move[k];
+              if (i && i.shoot) {
+                i.shoot = findTarget(game, i);
               }
             });
+
             actions.push(move);
           });
 
           // actions = [
           //    { P11: { pos: [0, 0] }, P12: { pos: [2, 1] }, P13: { pos: [3, 0] }, ... ],
-          //    { P11: { pos: [0, 0] }, P12: { pos: [2, 2], shoot: "west" }, P13: { pos: [3, 1], shoot: "west" } ... ],
-          //    { P12: { pos: [2, 3], shoot: "north" } ],
+          //    { P11: { pos: [0, 0] }, P12: { pos: [2, 2], shoot: [2, 5] }, P13: { pos: [3, 1], shoot: [3, 5] } ... ],
+          //    { P12: { pos: [2, 3], shoot: [3, 4] } ],
           //    ...
           // ]
 
@@ -146,3 +154,18 @@ wss.on('connection', ws => {
   });
 });
 
+function updateState(game, move) {
+  let chars = Object.keys(move);
+  let charsInt = Object.keys(move).map(x => parseInt(x));
+
+  game.state = game.state.map(row => row.map(cell => { return charsInt.indexOf(cell) != -1 ? 0 : cell }));
+
+  chars.forEach(char => {
+    let pos = move[char].pos;
+    game.state[pos[1]][pos[0]] = parseInt(char);
+  });
+}
+
+function findTarget(game, player) {
+
+}
