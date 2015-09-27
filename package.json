@@ -4,7 +4,7 @@
   "description": "AssociateWarriorServer",
   "private": false,
   "scripts": {
-    "start": "babel-node server.js",
+    "start": "./node_modules/.bin/babel-node server.js",
     "server": "nodemon -x babel-node server.js",
     "client": "babel-node client.js"
   },
@@ -12,7 +12,8 @@
     "node": ">= 0.10.0"
   },
   "author": "César Izurieta",
-  "devDependencies": {
+  "dependencies": {
+    "babel": "^5.8.23",
     "nodemon": "^1.7.1",
     "uuid-js": "^0.7.5",
     "ws": "^0.8.0"

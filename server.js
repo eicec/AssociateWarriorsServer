@@ -44,7 +44,7 @@ function setupPlayer(ws) {
   return [player, game];
 }
 
-let wss = new WebSocketServer({ port: 8080 });
+let wss = new WebSocketServer({ port: process.env.PORT || 8080 });
 
 wss.on('connection', ws => {
   let [player, game] = setupPlayer(ws);
