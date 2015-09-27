@@ -10,8 +10,8 @@ function send(player, message) {
 }
 
 function setupPlayer(ws) {
-  let player = { id: UUID.create().toString(), ws };
   let game = currentGame;
+  let player = { id: UUID.create().toString(), ws };
 
   console.log('player connected');
 
@@ -28,6 +28,8 @@ function setupPlayer(ws) {
   } else {
     console.log('joining existing game: %s', game.id);
   }
+
+  player.number = game.players.length + 1;
 
   game.players.push(player);
 
@@ -229,7 +231,7 @@ function findTarget(game, pos, player) {
     }
     let otherType = game.state[y][x];
     let otherChar = c.CHARACTERS[otherType];
-    if (otherChar && otherChar.player != player) {
+    if (otherChar && otherChar.player != player.number) {
       return tryShoot(char, x, y, otherChar, otherType);
     }
   }
@@ -242,7 +244,7 @@ function findTarget(game, pos, player) {
     }
     let otherType = game.state[y][x];
     let otherChar = c.CHARACTERS[otherType];
-    if (otherChar && otherChar.player != player) {
+    if (otherChar && otherChar.player != player.number) {
       return tryShoot(char, x, y, otherChar, otherType);
     }
   }
@@ -255,7 +257,7 @@ function findTarget(game, pos, player) {
     }
     let otherType = game.state[y][x];
     let otherChar = c.CHARACTERS[otherType];
-    if (otherChar && otherChar.player != player) {
+    if (otherChar && otherChar.player != player.number) {
       return tryShoot(char, x, y, otherChar, otherType);
     }
   }
@@ -268,7 +270,7 @@ function findTarget(game, pos, player) {
     }
     let otherType = game.state[y][x];
     let otherChar = c.CHARACTERS[otherType];
-    if (otherChar && otherChar.player != player) {
+    if (otherChar && otherChar.player != player.number) {
       return tryShoot(char, x, y, otherChar, otherType);
     }
   }
@@ -279,5 +281,5 @@ function findTarget(game, pos, player) {
 function tryShoot(char, x, y, otherChar, otherType) {
   let d = otherChar.defense;
   let p = char.power;
-  return [[x, y], Math.random() > (d == p ? 0.6 : d > p ? 0.4 : 0.8) ? otherType : null];
+  return [[x, y], Math.random() > (d == p ? 0.6 : d > p ? 0.4 : 0.8) ? otherType : false];
 }
