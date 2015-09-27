@@ -210,8 +210,6 @@ function findTarget(game, pos, player) {
   }
 
   let x, y;
-  console.log("pos=", pos);
-  console.log("row=", game.state[pos[1]]);
   let type = game.state[pos[1]][pos[0]];
   let char = c.CHARACTERS[type];
 

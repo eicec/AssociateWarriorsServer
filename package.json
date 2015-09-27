@@ -4,7 +4,8 @@
   "description": "AssociateWarriorServer",
   "private": false,
   "scripts": {
-    "start": "nodemon -x babel-node server.js",
+    "start": "babel-node server.js",
+    "server": "nodemon -x babel-node server.js",
     "client": "babel-node client.js"
   },
   "engines": {
