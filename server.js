@@ -147,6 +147,18 @@ wss.on('connection', ws => {
             // Mover os personagens
             Object.keys(move).forEach(k => {
               let i = move[k];
+              let pos = i.pos;
+              if (pos) {
+                var type = game.state[pos[1]][pos[0]];
+                console.log(type, c.MONEY, type == c.MONEY);
+                if (type == c.MONEY) {
+                  Object.keys(move).forEach(l => {
+                    let j = move[l];
+                    j.win = false;
+                  });
+                  i.win = true;
+                }
+              }
               Object.keys(move).forEach(l => {
                 let j = move[l];
                 if (i && j && i != j && i.pos == j.pos) {
